@@ -42,14 +42,65 @@ func main() {
 	if err != nil {
 		log.Fatal("Error unmarshalling JSON")
 	}
-	dataMap := origMap.(map[string]interface{})
-	fmt.Println(part1(dataMap))
+	sum := part1(origMap)
+	fmt.Println("Sum of all numbers:", sum)
+	sum2 := part2(origMap)
+	fmt.Println("Sum of all non-red branches:", sum2)
 }
 
-func part1(dataMap map[string]interface{}) int {
+func part1(data interface{}) int {
 	var sum int
 
+	switch v := data.(type) {
+	case float64:
+		sum += int(v)
+	case []interface{}:
+		for _, item := range v {
+			sum += part1(item)
+		}
+	case map[string]interface{}:
+		for _, item := range v {
+			sum += part1(item)
+		}
+	}
+
 	return sum
+}
+
+/*--- Part Two ---
+Uh oh - the Accounting-Elves have realized that they double-counted everything red.
+
+Ignore any object (and all of its children) which has any property with the value "red". Do this only for objects ({...}), not arrays ([...]).
+
+[1,2,3] still has a sum of 6.
+[1,{"c":"red","b":2},3] now has a sum of 4, because the middle object is ignored.
+{"d":"red","e":[1,2,3,4],"f":5} now has a sum of 0, because the entire structure is ignored.
+[1,"red",5] has a sum of 6, because "red" in an array has no effect. */
+
+func part2(data interface{}) int {
+	switch v := data.(type) {
+	case float64:
+		return int(v)
+	case []interface{}:
+		sum := 0
+		for _, item := range v {
+			sum += part2(item)
+		}
+		return sum
+	case map[string]interface{}:
+		for _, val := range v {
+			if str, ok := val.(string); ok && str == "red" {
+				return 0
+			}
+		}
+
+		sum := 0
+		for _, item := range v {
+			sum += part2(item)
+		}
+		return sum
+	}
+	return 0
 }
 
 
