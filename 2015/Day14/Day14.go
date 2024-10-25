@@ -23,6 +23,7 @@ func main() {
 	}
 
 	fmt.Println(part1(lines))
+	fmt.Println(part2(lines))
 }
 
 func part1(lines []string) int {
@@ -65,8 +66,43 @@ func part2(lines []string) int {
 			"speed":    speed,
 			"moveTime": moveTime,
 			"restTime": restTime,
+			"points":   0,
+			"distance": 0,
 		}
 	}
 
-	return 0
+	for second := 0; second <= 2503; second++ {
+		var leaderDistance int
+
+		for reindeer, stats := range reindeers {
+			if isFlying(second, stats["moveTime"], stats["restTime"]) {
+				reindeers[reindeer]["distance"] += stats["speed"]
+			}
+
+			if reindeers[reindeer]["distance"] > leaderDistance {
+				leaderDistance = reindeers[reindeer]["distance"]
+			}
+		}
+
+		for reindeer := range reindeers {
+			if reindeers[reindeer]["distance"] == leaderDistance {
+				reindeers[reindeer]["points"]++
+			}
+		}
+	}
+
+	var maxPoints int
+	for _, stats := range reindeers {
+		if stats["points"] > maxPoints {
+			maxPoints = stats["points"]
+		}
+	}
+
+	return maxPoints
+}
+
+func isFlying(t, moveTime, restTime int) bool {
+	cycleTime := moveTime + restTime
+	timeInCycle := t % cycleTime
+	return timeInCycle < moveTime
 }
