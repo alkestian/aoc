@@ -1,20 +1,27 @@
 package main
 
-import "fmt"
+import (
+	"bufio"
+	"fmt"
+	"log"
+	"os"
+	"strings"
+)
 
 func main() {
-	grid := [][]string{
-		{"." , ".", ".", ".", ".", ".", ".", ".", ".", "#"},
-		{"." , ".", ".", ".", ".", ".", ".", ".", ".", "."},
-		{"." , ".", "#", ".", ".", ".", ".", ".", ".", "."},
-		{"." , ".", ".", ".", ".", ".", ".", "#", ".", "."},
-		{"." , ".", ".", ".", ".", ".", ".", ".", ".", "."},
-		{"." , "#", ".", ".", "^", ".", ".", ".", ".", "."},
-		{"." , ".", ".", ".", ".", ".", ".", "#", ".", "."},
-		{"#" , ".", ".", ".", ".", ".", ".", ".", ".", "."},
-		{"." , ".", ".", ".", ".", ".", "#", ".", ".", "."},
+	var grid [][]string
+	file, err := os.Open("./input.txt")
+	if err != nil {
+		log.Fatal("Error parsing input")
 	}
+	defer file.Close()
 
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := strings.Split(scanner.Text(), "")
+		grid = append(grid, line)
+	}
+	
 	rowLen := len(grid[0])
 	colLen := len(grid)
 	y, x := findTheCursor(grid, rowLen, colLen)
@@ -23,51 +30,79 @@ func main() {
 }
 
 func part1(grid [][]string, y int, x int, rowLen int, colLen int, cursor string) int {
-	grid2 := grid
+	grid2 := make([][]string, rowLen)
+    for i := range grid {
+        grid2[i] = append([]string{}, grid[i]...)
+    }
+
 	for {
-		initialX, initialY := x, y
-		updateGrid(grid2, initialY, initialX)
-		if cursor == "^" && y - 1 >= 0 {
-			if grid[y-1][x] == "#" {
-				cursor = rotateCursor(cursor)
-			} else {
-				y = y - 1
-			}
-		} else if cursor == ">" && x + 1 <= rowLen {
-			if grid[y][x+1] == "#" {
-				cursor = rotateCursor(cursor)
-			} else {
-				x = x + 1
-			}
-		} else if cursor == "v" && y + 1 <= colLen {
-			if grid[y+1][x] == "#" {
-				cursor = rotateCursor(cursor)
-			} else {
-				y = y + 1
-			}
-		} else if cursor == "<" && x - 1 >= 0 {
-			if grid[y][x-1] == "#" {
-				cursor = rotateCursor(cursor)
-			} else {
-				x = x - 1
-			}
-		} else {
+		if y < 0 || y >= rowLen || x < 0 || x >= colLen {
 			break
+		}
+		
+		updateGrid(grid2, y, x)
+
+		// Move based on the current cursor direction
+		switch cursor {
+		case "^":
+			if y-1 >= 0 {
+				if grid[y-1][x] == "#" {
+					cursor = rotateCursor(cursor) // Rotate if blocked
+				} else {
+					y-- // Move up
+				}
+			} else {
+				y--
+			} 
+		case ">":
+			if x+1 < colLen {
+				if grid[y][x+1] == "#" {
+					cursor = rotateCursor(cursor) // Rotate if blocked
+				} else {
+					x++ // Move right
+				}
+			} else {
+				x++
+			}
+		case "v":
+			if y+1 < rowLen {
+				if grid[y+1][x] == "#" {
+					cursor = rotateCursor(cursor) // Rotate if blocked
+				} else {
+					y++ // Move down
+				}
+			} else {
+				y++
+			}
+		case "<":
+			if x-1 >= 0 {
+				if grid[y][x-1] == "#" {
+					cursor = rotateCursor(cursor) // Rotate if blocked
+				} else {
+					x-- // Move left
+				}
+			} else {
+				x--
+			}
 		}
 	}
 	return countVisitedPoints(grid2, rowLen, colLen)
 }
 
+
+
 func rotateCursor(cursor string) string {
+	newCursor := ""
 	if cursor == "^" {
-		return ">"
+		newCursor = ">"
 	} else if cursor == ">" {
-		return "v"
+		newCursor = "v"
 	} else if cursor == "v" {
-		return "<"
-	} else {
-		return "^"
+		newCursor = "<"
+	} else if cursor == "<" {
+		newCursor = "^"
 	}
+	return newCursor
 }
 
 func findTheCursor(grid [][]string, rowLen int, colLen int) (int, int) {
