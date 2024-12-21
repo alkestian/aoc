@@ -21,6 +21,7 @@ func main() {
 	fmt.Printf("The post-arrangement string is: %s\n", arranged)
 	checksum := generateChecksum(arranged)
 	fmt.Printf("Your checksum sum is %d\n", checksum)
+	//Answer too low?
 }
 
 func generateChecksum(arranged string) int {
