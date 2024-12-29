@@ -24,6 +24,10 @@ func main() {
 	}
 
 	fmt.Println("Part 1:", part1(lines))
+	fmt.Println("Part 2:")
+	for name, sid := range part2(lines) {
+		fmt.Println(name, sid)
+	}
 
 }
 
@@ -68,4 +72,30 @@ func part1(lines []string) int {
 	}
 
 	return idSum
+}
+
+func part2(lines []string) map[string]int {
+	alphabet := "abcdefghijklmnopqrstuvwxyz"
+	realNames := make(map[string]int)
+
+	for _, line := range lines {
+		parts := strings.Split(line, "[")
+		parts = strings.Split(parts[0], "-")
+		parts, sid := parts[:len(parts)-1], parts[len(parts)-1]
+		sectorId, _ := strconv.Atoi(sid)
+		unparted := strings.Join(parts, "-")
+		shiftKey := alphabet[sectorId%26:] + alphabet[:sectorId%26]
+		cipher := make(map[string]string)
+		cipher["-"] = " "
+		for i, char := range alphabet {
+			cipher[string(char)] = string(shiftKey[i])
+		}
+		var decrypted strings.Builder
+		for _, char := range unparted {
+			decrypted.WriteString(cipher[string(char)])
+		}
+		realNames[decrypted.String()] = sectorId
+	}
+
+	return realNames
 }
