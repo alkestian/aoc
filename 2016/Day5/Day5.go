@@ -11,6 +11,7 @@ import (
 func main() {
 	input := "cxdnnyjw"
 
+	fmt.Println("Part 1:", part1(input))
 	fmt.Println("Part 2:", part2(input))
 }
 
@@ -24,8 +25,6 @@ func part1(doorId string) string {
 		hashString := hex.EncodeToString(hash.Sum(nil))
 		if hashString[:5] == "00000" {
 			password.WriteByte(hashString[5])
-		} else {
-			fmt.Println(index, "...", password.String())
 		}
 		index++
 	}
@@ -33,30 +32,28 @@ func part1(doorId string) string {
 }
 
 func part2(doorId string) string {
-	var password [8]string
-	index := 0
-	for {
-		matchCounter := 0
-		for i := 0; i < 8; i++ {
-			if password[i] != "" {
-				matchCounter++
-			}
-		}
-		if matchCounter >= 8 {
-			return strings.Join(password[:], "")
-		}
-		prehash := doorId + strconv.Itoa(index)
-		hash := md5.New()
-		hash.Write([]byte(prehash))
-		hashString := hex.EncodeToString(hash.Sum(nil))
-		if hashString[:5] == "00000" {
-			position, _ := strconv.Atoi(string(hashString[5]))
-			if position < 8 {
-				password[position] = string(hashString[6])
-			}
-		} else {
-			fmt.Println(index, "...", password)
-		}
-		index++
-	}
+    var password [8]string
+    index := 0
+    for {
+        matchCounter := 0
+        for i := 0; i < 8; i++ {
+            if password[i] != "" {
+                matchCounter++
+            }
+        }
+        if matchCounter >= 8 {
+            return strings.Join(password[:], "")
+        }
+        prehash := doorId + strconv.Itoa(index)
+        hash := md5.New()
+        hash.Write([]byte(prehash))
+        hashString := hex.EncodeToString(hash.Sum(nil))
+        if hashString[:5] == "00000" {
+            position, err := strconv.Atoi(string(hashString[5]))
+            if err == nil && position < 8 && password[position] == "" {
+                password[position] = string(hashString[6])
+            }
+        }
+        index++
+    }
 }
