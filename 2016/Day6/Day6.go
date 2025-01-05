@@ -10,23 +10,6 @@ import (
 )
 
 func main() {
-	// lines := []string{"eedadn",
-	// 	"drvtee",
-	// 	"eandsr",
-	// 	"raavrd",
-	// 	"atevrs",
-	// 	"tsrnev",
-	// 	"sdttsa",
-	// 	"rasrtv",
-	// 	"nssdts",
-	// 	"ntnada",
-	// 	"svetve",
-	// 	"tesnvt",
-	// 	"vntsnd",
-	// 	"vrdear",
-	// 	"dvrsen",
-	// 	"enarar"}
-
 	file, err := os.Open("input.txt")
 	if err != nil {
 		log.Fatal("error parsing input")
@@ -40,6 +23,7 @@ func main() {
 	}
 
 	fmt.Println("Part 1:", part1(lines))
+	fmt.Println("Part 2:", part2(lines))
 }
 
 func part1(lines []string) string {
@@ -49,12 +33,24 @@ func part1(lines []string) string {
 		for _, line := range lines {
 			letterCounter[line[i]]++
 		}
-		result.WriteByte(sortMap(letterCounter))
+		result.WriteByte(sortMap(letterCounter, "a"))
 	}
 	return result.String()
 }
 
-func sortMap(dict map[byte]int) byte {
+func part2(lines []string) string {
+	var result strings.Builder
+	for i := 0; i < len(lines[0]); i++ {
+		letterCounter := make(map[byte]int)
+		for _, line := range lines {
+			letterCounter[line[i]]++
+		}
+		result.WriteByte(sortMap(letterCounter, "b"))
+	}
+	return result.String()
+}
+
+func sortMap(dict map[byte]int, order string) byte {
 	type kv struct {
 		Key byte
 		Value int
@@ -63,11 +59,20 @@ func sortMap(dict map[byte]int) byte {
 	for k, v := range dict {
 		sorter = append(sorter, kv{k, v})
 	}
-	sort.Slice(sorter, func(i, j int) bool {
-		if sorter[i].Value == sorter[j].Value {
-			return sorter[i].Key < sorter[j].Key
-		}
-		return sorter[i].Value > sorter[j].Value
-	})
+	if order == "a" {
+		sort.Slice(sorter, func(i, j int) bool {
+			if sorter[i].Value == sorter[j].Value {
+				return sorter[i].Key < sorter[j].Key
+			}
+			return sorter[i].Value > sorter[j].Value
+		})
+	} else {
+		sort.Slice(sorter, func(i, j int) bool {
+			if sorter[i].Value == sorter[j].Value {
+				return sorter[i].Key > sorter[j].Key
+			}
+			return sorter[i].Value < sorter[j].Value
+		})
+	}
 	return sorter[0].Key
 }
