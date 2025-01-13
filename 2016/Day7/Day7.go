@@ -91,17 +91,20 @@ func part2(lines []string) int {
 
         for _, hypernet := range hypernets {
             //Check for bab
+            match := false
             for i := 0; i < len(hypernet) - 3; i++ {
+                if match {
+                    break
+                }
                 segment := hypernet[i:i+3]
                 for _, aba := range abas {
                      //flip aba, check against segment
+                     if {
+                        match = true
+                        break
+                     }
                 }
             }
-        }
-        
-
-        if skip {
-            continue
         }
     }
     return abaCounter
