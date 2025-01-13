@@ -61,6 +61,52 @@ func part1(lines []string) int {
     return abbaCounter
 }
 
+func part2(lines []string) int {
+    abaCounter := 0
+    for _, line := range lines {
+        var pieces []string
+        var hypernets []string
+
+        parts := strings.Split(line, "[")
+        pieces = append(pieces, parts[0])
+        for i := 1; i < len(parts); i++ {
+            subParts := strings.Split(parts[i], "]")
+            hypernets = append(hypernets, subParts[0])
+            if len(subParts) > 1 {
+                pieces = append(pieces, subParts[1])
+            } 
+        }
+
+        var abas []string 
+
+        for _, piece := range pieces {
+            //check for aba
+            for i := 0; i < len(piece) - 3; i++ {
+                segment := piece[i:i+3]
+                if segment[0] == segment[2] {
+                    abas = append(abas, segment)
+                } 
+            }
+        }
+
+        for _, hypernet := range hypernets {
+            //Check for bab
+            for i := 0; i < len(hypernet) - 3; i++ {
+                segment := hypernet[i:i+3]
+                for _, aba := range abas {
+                     //flip aba, check against segment
+                }
+            }
+        }
+        
+
+        if skip {
+            continue
+        }
+    }
+    return abaCounter
+}
+
 func containsABBA(s string) bool {
     for i := 0; i <= len(s)-4; i++ {
         if s[i] != s[i+1] && s[i:i+2] == reverse(s[i+2:i+4]) {
