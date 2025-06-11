@@ -12,7 +12,7 @@ func main() {
 	}
 	captcha := string(file)
 	part1(captcha)
-	part1(captcha)
+	part2(captcha)
 }
 
 func part1(captcha string) {	
@@ -29,7 +29,7 @@ func part1(captcha string) {
 func part2(captcha string) {
 	var total int
 	for i, x := range captcha {
-		if x == rune(captcha[(i + len(captcha)/2) % len(captcha)]) {
+		if x == rune(captcha[(i + (len(captcha)/2)) % len(captcha)]) {
 			total += int(x - '0')
 		}	
 	}
