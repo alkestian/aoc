@@ -1,32 +1,28 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"os"
 	"regexp"
 	"slices"
+	"strings"
+
+	"github.com/Alkestian/AdventOfCode/utils"
 )
 
 func main() {
-	file, err := os.Open("input.txt")
+	lines, err := utils.InputReader()
 	if err != nil {
-		defer file.Close()
-		fmt.Println(fmt.Errorf("error opening input file: %w", err))
+		fmt.Printf("Error reading input: %v\n", err)
 	}
 
-	 scanner := bufio.NewScanner(file)
-	 var lines []string
-	 for scanner.Scan() {
-		lines = append(lines, scanner.Text())
-	 }
+	 pattern := regexp.MustCompile(`[a-zA-Z]+`)
 
-	 fmt.Printf("Part 1: %d\n", part1(lines))
+	 fmt.Printf("Part 1: %d\n", part1(lines, pattern))
+	 fmt.Printf("Part 2: %d\n", part2(lines, pattern))
 }
 
-func part1(lines []string) int {
+func part1(lines []string, pattern *regexp.Regexp) int {
 	valid := 0
-	pattern := regexp.MustCompile(`[a-zA-Z]+`)
 	for _, line := range lines {
 		words := pattern.FindAllString(line, -1)
 		var checkedWords []string
@@ -39,6 +35,31 @@ func part1(lines []string) int {
 					matchFound = true
 				}
 			checkedWords = append(checkedWords, word)
+		}
+		if !matchFound {
+			valid++
+		}
+	}
+	return valid
+}
+
+func part2(lines []string, pattern *regexp.Regexp) int {
+	valid := 0
+	for _, line := range lines {
+		words := pattern.FindAllString(line, -1)
+		var sortedWords []string
+		var matchFound bool
+		for _, word := range words {
+			if matchFound {
+				break
+			}
+			letters := strings.Split(word, "")
+			slices.Sort(letters)
+			word := strings.Join(letters, "")
+			if slices.Contains(sortedWords, word) {
+				matchFound = true
+			}
+			sortedWords = append(sortedWords, word)
 		}
 		if !matchFound {
 			valid++
